@@ -4,6 +4,8 @@ MinerAPI
 
 Python wrapper for the miners RPC API (`cgminer <https://github.com/ckolivas/cgminer>`_/`bfgminer <https://github.com/luke-jr/bfgminer>`_, `cpuminer-multi <https://github.com/tpruvot/cpuminer-multi>`_).
 
+This is a fork of `pycgminer <https://github.com/tsileo/pycgminer>`_ by Thomas Sileo.
+
 
 Installation
 ------------
