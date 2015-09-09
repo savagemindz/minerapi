@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 import socket
 import json
 
@@ -11,7 +11,6 @@ class Miner(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, host='localhost', port=None):
-        self.data = {}
         self.host = host
         if port is not None:
             self.port = port
@@ -22,6 +21,10 @@ class Miner(object):
 
     @abstractmethod
     def _parse(self, data):
+        pass
+
+    @abstractproperty
+    def _commands(self):
         pass
 
     def json(self, data):
@@ -57,6 +60,9 @@ class Miner(object):
                 break
         return msg
 
+    def __dir__(self):
+        return self._commands
+
     def __getattr__(self, attr):
         """ Allow us to make command calling methods.
 
@@ -73,6 +79,18 @@ class Cgminer(Miner):
     """ Cgminer RPC API wrapper """
 
     port = 4028
+    _commands = [
+        'version', 'config', 'summary', 'pools', 'devs', 'edevs',
+        'pga', 'pgacount',
+        'switchpool', 'enablepool', 'addpool', 'poolpriority', 'poolquota',
+        'disablepool', 'removepool',
+        'save', 'quit', 'notify', 'privileged',
+        'pgaenable', 'pgadisable', 'pgaidentify', 'devdetails', 'restart',
+        'stats', 'estats', 'check', 'coin', 'debug', 'setconfig',
+        'usbstats', 'pgaset', 'zero', 'hotplug',
+        'asc', 'ascenable', 'ascdisable', 'ascidentify', 'asccount',
+        'ascset', 'lcd', 'lockstats'
+    ]
 
     def _format(self, command, args):
         payload = {"command": command}
@@ -85,3 +103,17 @@ class Cgminer(Miner):
 
     def _parse(self, data):
         return json.loads(data)
+
+    def failover_only(self, switch):
+        return self.command('failover-only', 'true' if switch else 'false')
+
+
+class Bfgminer(Cgminer):
+    _commands = list(set(Cgminer._commands).union([
+        'procs', 'devscan', 'proc', 'proccount', 'pgarestart',
+        'procenable', 'procdisable', 'procidentify', 'procset'
+    ]) - set([
+        'usbstats', 'estats',
+        'asc', 'ascenable', 'ascdisable', 'ascidentify', 'asccount',
+        'ascset', 'lcd', 'lockstats'
+    ]))
