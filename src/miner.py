@@ -75,6 +75,10 @@ class Miner(object):
         return out
 
 
+class MinerException(Exception):
+    pass
+
+
 class Cgminer(Miner):
     """ Cgminer RPC API wrapper """
 
@@ -106,6 +110,26 @@ class Cgminer(Miner):
 
     def failover_only(self, switch):
         return self.command('failover-only', 'true' if switch else 'false')
+
+    def command(self, command, *args):
+        response = super(Cgminer, self).command(command, *args)
+        try:
+            values = response[command.upper()]
+        except KeyError:
+            status = response.pop('STATUS')[0]
+            if status['STATUS'] in ('E', 'F'):
+                raise MinerException(status['Msg'])
+            else:
+                try:
+                    values = response[
+                        filter(lambda k: k != 'id', response)[0]]
+                except IndexError:
+                    return
+        if len(values) > 1 or command[-1] == 's':
+            return values
+
+        value = values[0]
+        return value if len(value) > 1 else value.values()[0]
 
 
 class Bfgminer(Cgminer):
@@ -147,4 +171,9 @@ class Cpuminer(Miner):
         return json.dumps(self._super_json(data))
 
     def command(self, command, *args):
-        return self._super_json(self._format(command, args))
+        values = self._super_json(self._format(command, args))
+        if not values:
+            raise MinerException('No answer')
+
+        return values if len(values) > 1 or command[-1] == 's' \
+            else values[0]
