@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name="minerapi",
-    version="0.1.2",
+    version="0.2.0",
     author="Dmitri Bogomolov",
     author_email="4glitch@gmail.com",
     description="Python wrapper for the miners RPC API",

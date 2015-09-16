@@ -117,3 +117,34 @@ class Bfgminer(Cgminer):
         'asc', 'ascenable', 'ascdisable', 'ascidentify', 'asccount',
         'ascset', 'lcd', 'lockstats'
     ]))
+
+
+class Cpuminer(Miner):
+    port = 4048
+    _commands = ['summary', 'threads', 'seturl', 'quit']
+
+    def _format(self, command, args):
+        return command
+
+    def _parse(self, data):
+        def split_key_value(word):
+            key, value = word.split('=')
+            try:
+                val = (float if '.' in value else int)(value)
+            except ValueError:
+                val = value
+            return key, val
+
+        return [
+            dict(split_key_value(item) for item in part.split(';'))
+            for part in data.split('|') if part
+        ]
+
+    def _super_json(self, data):
+        return self._parse(super(Cpuminer, self).json(data))
+
+    def json(self, data):
+        return json.dumps(self._super_json(data))
+
+    def command(self, command, *args):
+        return self._super_json(self._format(command, args))
