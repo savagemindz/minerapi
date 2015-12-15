@@ -115,6 +115,10 @@ class Cgminer(Miner):
     def failover_only(self, switch):
         return self.command('failover-only', 'true' if switch else 'false')
 
+    def save(self, filepath=None):
+        return self.command('save',
+                            filepath or self.config()['ConfigFile0'])
+
     def command(self, command, *args):
         response = super(Cgminer, self).command(command, *args)
         try:
