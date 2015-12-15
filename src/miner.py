@@ -99,7 +99,11 @@ class Cgminer(Miner):
     def _format(self, command, args):
         payload = {"command": command}
         if args:
-            arg = ",".join(map(str, args))
+            arg = ",".join(map(
+                lambda arg:
+                str(arg).replace('\\','\\\\').replace(',','\\,'),
+                args
+            ))
             # Parameter must be converted to basestring (no int)
             payload.update({'parameter': unicode(arg)})
 
