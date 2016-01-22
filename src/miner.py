@@ -167,10 +167,13 @@ class Cpuminer(Miner):
                 val = value
             return key, val
 
-        return [
-            dict(split_key_value(item) for item in part.split(';'))
-            for part in data.split('|') if part
-        ]
+        try:
+            return [
+                dict(split_key_value(item) for item in part.split(';'))
+                for part in data.split('|') if part
+            ]
+        except ValueError:
+            pass
 
     def _super_json(self, data):
         return self._parse(super(Cpuminer, self).json(data))
@@ -180,6 +183,8 @@ class Cpuminer(Miner):
 
     def command(self, command, *args):
         values = self._super_json(self._format(command, args))
+        if command == 'quit':
+            return
         if not values:
             raise MinerException('No answer')
 
