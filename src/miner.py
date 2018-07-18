@@ -42,7 +42,8 @@ class Miner(object):
                 pass
             sock.close()
 
-        return received[:-1]
+        return received[:-1].replace(
+            '#', '').replace('\n', '\\n').replace('\t', '\\t')
 
     def command(self, command, *args):
         """ Send a command (a json encoded dict) and
