@@ -28,7 +28,7 @@ class Miner(object):
         pass
 
     def json(self, data):
-
+        """ Get raw json string from miner """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
@@ -101,7 +101,7 @@ class Cgminer(Miner):
         if args:
             arg = ",".join(map(
                 lambda arg:
-                str(arg).replace('\\','\\\\').replace(',','\\,'),
+                str(arg).replace('\\', '\\\\').replace(',', '\\,'),
                 args
             ))
             # Parameter must be converted to basestring (no int)
