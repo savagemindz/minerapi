@@ -1,6 +1,6 @@
 .. include:: ../README.rst
 
-Documentation:
+Documentation
 --------------
 .. automodule:: minerapi
   :members:
