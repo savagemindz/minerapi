@@ -10,7 +10,7 @@ This is a fork of `pycgminer <https://github.com/tsileo/pycgminer>`_ by Thomas S
 Installation
 ------------
 
-.. code-block::
+.. code-block:: sh
 
     $ pip install minerapi
 
