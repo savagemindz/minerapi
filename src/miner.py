@@ -33,8 +33,8 @@ class Miner(object):
 
         try:
             sock.connect((self.host, self.port))
-            sock.send(data)
-            received = self._receive(sock)
+            sock.send(data.encode('utf-8'))
+            received = self._receive(sock).decode('utf-8')
         finally:
             try:
                 sock.shutdown(socket.SHUT_RDWR)
@@ -52,11 +52,11 @@ class Miner(object):
         return self._parse(self.json(self._format(command, args)))
 
     def _receive(self, sock, size=4096):
-        msg = ''
+        msg = bytearray()
         while 1:
             chunk = sock.recv(size)
             if chunk:
-                msg += chunk
+                msg.extend(chunk)
             else:
                 break
         return msg
