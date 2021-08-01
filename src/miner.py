@@ -106,12 +106,17 @@ class Cgminer(Miner):
                 args
             ))
             # Parameter must be converted to basestring (no int)
-            payload.update({'parameter': unicode(arg)})
+            payload.update({'parameter': str(arg)})
 
         return json.dumps(payload)
 
     def _parse(self, data):
-        return json.loads(data)
+        try:
+            return json.loads(data)
+        except json.decoder.JSONDecodeError:
+            # My miner returns invalid json for stats. Try to fix it
+            fixed_data = data.replace("}{", ",")
+            return json.loads(fixed_data)
 
     def failover_only(self, switch):
         return self.command('failover-only', 'true' if switch else 'false')
